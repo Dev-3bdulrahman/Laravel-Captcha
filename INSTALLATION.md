@@ -9,15 +9,17 @@ Before installing, make sure you have:
 - PHP 8.0 or higher
 - Laravel 9.x, 10.x, or 11.x
 - Composer
-- GD Library (for image captcha)
+- GD Library (optional - only for PNG image captcha)
 
-### Check GD Library
+### Check GD Library (Optional)
+
+> **Note**: GD Library is only required if you want to use PNG format for image captcha. You can use SVG format instead which doesn't require GD Library.
 
 ```bash
 php -m | grep -i gd
 ```
 
-If GD is not installed:
+If GD is not installed and you want to use PNG format:
 
 **Ubuntu/Debian:**
 ```bash
@@ -31,6 +33,8 @@ brew install php-gd
 
 **Windows:**
 Enable `extension=gd` in your `php.ini` file.
+
+**Alternative**: Use SVG format by setting `CAPTCHA_USE_SVG=true` in your `.env` file.
 
 ## Installation Steps
 
@@ -198,9 +202,11 @@ Or with PHPUnit directly:
 ### Issue: Captcha image not showing
 
 **Solution:**
-1. Make sure GD library is installed
-2. Check file permissions on `storage/` directory
-3. Clear cache: `php artisan cache:clear`
+1. If using PNG format: Make sure GD library is installed
+2. If using SVG format: Check browser console for errors
+3. Check file permissions on `storage/` directory
+4. Clear cache: `php artisan cache:clear`
+5. Try switching to SVG format: Set `CAPTCHA_USE_SVG=true` in `.env`
 
 ### Issue: "Class 'Captcha' not found"
 

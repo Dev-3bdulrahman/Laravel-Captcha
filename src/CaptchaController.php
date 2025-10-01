@@ -55,6 +55,25 @@ class CaptchaController extends Controller
     }
 
     /**
+     * Generate captcha SVG image.
+     *
+     * @param Request $request
+     * @param string|null $type
+     * @return \Illuminate\Http\Response
+     */
+    public function svg(Request $request, ?string $type = null)
+    {
+        $type = $type ?? $request->get('type', 'image');
+        $difficulty = $request->get('difficulty', config('captcha.difficulty'));
+
+        try {
+            return App::make('captcha')->svg($type, $difficulty);
+        } catch (\Exception $e) {
+            abort(400, $e->getMessage());
+        }
+    }
+
+    /**
      * Verify captcha input.
      *
      * @param Request $request

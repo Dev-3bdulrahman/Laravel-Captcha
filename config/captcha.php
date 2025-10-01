@@ -49,6 +49,12 @@ return [
     |--------------------------------------------------------------------------
     */
     'image' => [
+        /*
+        | Use SVG format instead of PNG (no GD library required)
+        | Set to true to use SVG, false to use PNG with GD library
+        */
+        'use_svg' => env('CAPTCHA_USE_SVG', true),
+        
         'width' => 200,
         'height' => 60,
         'length' => [

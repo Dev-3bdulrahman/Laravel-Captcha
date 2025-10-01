@@ -145,6 +145,31 @@ class CaptchaManager
     }
 
     /**
+     * Get captcha SVG image.
+     *
+     * @param string|null $type
+     * @param string|null $difficulty
+     * @return \Illuminate\Http\Response
+     */
+    public function svg(?string $type = null, ?string $difficulty = null)
+    {
+        $type = $type ?? 'image';
+        $difficulty = $difficulty ?? config('captcha.difficulty', 'medium');
+
+        if (!isset($this->generators[$type])) {
+            throw new \InvalidArgumentException("Captcha type [{$type}] is not supported.");
+        }
+
+        $generator = new $this->generators[$type]($difficulty);
+        
+        if (!method_exists($generator, 'svg')) {
+            throw new \BadMethodCallException("Generator [{$type}] does not support SVG generation.");
+        }
+
+        return $generator->svg();
+    }
+
+    /**
      * Get captcha data.
      *
      * @param string|null $type

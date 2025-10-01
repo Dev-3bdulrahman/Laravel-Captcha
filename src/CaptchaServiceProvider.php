@@ -67,6 +67,8 @@ class CaptchaServiceProvider extends ServiceProvider
                 ->name('captcha.generate');
             Route::get('/image/{type?}', [CaptchaController::class, 'image'])
                 ->name('captcha.image');
+            Route::get('/svg/{type?}', [CaptchaController::class, 'svg'])
+                ->name('captcha.svg');
             Route::post('/verify', [CaptchaController::class, 'verify'])
                 ->name('captcha.verify');
             Route::get('/refresh', [CaptchaController::class, 'refresh'])

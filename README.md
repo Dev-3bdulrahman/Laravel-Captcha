@@ -22,12 +22,15 @@ A simple, standalone Laravel CAPTCHA package with multiple styles and difficulty
 - 📱 **Responsive Design**: Works perfectly on all devices
 - ⚡ **Lightweight**: Minimal dependencies, maximum performance
 - 🎨 **Customizable**: Extensive configuration options
+- 🖼️ **SVG Support**: No GD Library required when using SVG format
 
 ## 📋 Requirements
 
 - PHP 8.0 or higher
 - Laravel 9.x, 10.x, or 11.x
-- GD Library (for image captcha)
+- GD Library (optional - only required for PNG image captcha)
+
+> **Note**: Starting from version 2.0, you can use SVG captcha which doesn't require GD Library!
 
 ## 📦 Installation
 
@@ -142,6 +145,33 @@ That's it! 🎉
 - **modern**: Sleek, contemporary design
 - **minimal**: Clean and simple
 - **colorful**: Vibrant and eye-catching
+
+### Using SVG Captcha (No GD Library Required)
+
+To use SVG captcha instead of PNG (which requires GD Library), update your configuration:
+
+```php
+// config/captcha.php
+'image' => [
+    'use_svg' => true, // Enable SVG format
+    // ... other settings
+],
+```
+
+Or set the environment variable:
+
+```bash
+CAPTCHA_USE_SVG=true
+```
+
+Then use it normally:
+
+```blade
+@include('captcha::captcha', [
+    'type' => 'image',
+    'difficulty' => 'medium'
+])
+```
 
 ### Using the Facade
 
