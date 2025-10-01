@@ -1,0 +1,51 @@
+{
+    "name": "dev-3bdulrahman/laravel-captcha",
+    "description": "A simple, standalone Laravel CAPTCHA package with multiple styles and difficulty levels",
+    "keywords": ["laravel", "captcha", "security", "validation", "spam-protection"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abdulrahman Mehesan",
+            "email": "contact@3bdulrahman.com",
+            "homepage": "https://3bdulrahman.com/"
+        }
+    ],
+    "homepage": "https://github.com/Dev-3bdulrahman/Laravel-Captcha",
+    "require": {
+        "php": "^8.0|^8.1|^8.2|^8.3",
+        "illuminate/support": "^9.0|^10.0|^11.0",
+        "illuminate/session": "^9.0|^10.0|^11.0",
+        "intervention/image": "^2.7|^3.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0|^8.0|^9.0",
+        "phpunit/phpunit": "^9.5|^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dev3bdulrahman\\LaravelCaptcha\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dev3bdulrahman\\LaravelCaptcha\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Dev3bdulrahman\\LaravelCaptcha\\CaptchaServiceProvider"
+            ],
+            "aliases": {
+                "Captcha": "Dev3bdulrahman\\LaravelCaptcha\\Facades\\Captcha"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
+
