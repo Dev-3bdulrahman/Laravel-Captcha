@@ -83,7 +83,26 @@ class CaptchaServiceProvider extends ServiceProvider
     {
         Validator::extend('captcha', function ($attribute, $value, $parameters, $validator) {
             $type = $parameters[0] ?? config('captcha.default');
-            return app('captcha')->verify($value, $type);
+
+            // Log: Validation rule called
+            \Log::info('🔐 CAPTCHA VALIDATION RULE CALLED', [
+                'attribute' => $attribute,
+                'value' => $value,
+                'type' => $type,
+                'parameters' => $parameters,
+                'default_type' => config('captcha.default')
+            ]);
+
+            $result = app('captcha')->verify($value, $type);
+
+            // Log: Validation result
+            \Log::info('🔐 CAPTCHA VALIDATION RESULT', [
+                'result' => $result ? 'PASS' : 'FAIL',
+                'value' => $value,
+                'type' => $type
+            ]);
+
+            return $result;
         }, 'The captcha verification failed.');
 
         Validator::replacer('captcha', function ($message, $attribute, $rule, $parameters) {

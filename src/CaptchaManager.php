@@ -69,9 +69,21 @@ class CaptchaManager
 
         // Store in session
         $sessionKey = config('captcha.session_key', 'laravel_captcha');
+        $expiresAt = now()->addMinutes(config('captcha.expire', 5));
+
         Session::put("{$sessionKey}.{$type}", [
             'value' => $data['value'],
-            'expires_at' => now()->addMinutes(config('captcha.expire', 5)),
+            'expires_at' => $expiresAt,
+        ]);
+
+        // Log: Captcha generated
+        \Log::info('🎨 CAPTCHA GENERATED', [
+            'type' => $type,
+            'difficulty' => $difficulty,
+            'value' => $data['value'],
+            'session_key' => "{$sessionKey}.{$type}",
+            'expires_at' => $expiresAt->toDateTimeString(),
+            'session_id' => Session::getId()
         ]);
 
         return $data;
@@ -88,32 +100,81 @@ class CaptchaManager
     {
         $type = $type ?? config('captcha.default', 'image');
         $sessionKey = config('captcha.session_key', 'laravel_captcha');
-        
+
+        // Log: Start verification
+        \Log::info('🔍 CAPTCHA VERIFICATION START', [
+            'input' => $input,
+            'type' => $type,
+            'session_key' => $sessionKey,
+            'full_session_key' => "{$sessionKey}.{$type}"
+        ]);
+
         $captchaData = Session::get("{$sessionKey}.{$type}");
 
         if (!$captchaData) {
+            \Log::warning('❌ CAPTCHA VERIFICATION FAILED: No captcha data in session', [
+                'session_key' => "{$sessionKey}.{$type}",
+                'all_session_keys' => array_keys(Session::all())
+            ]);
             return false;
         }
 
+        // Log: Captcha data found
+        \Log::info('✅ CAPTCHA DATA FOUND', [
+            'expected_value' => $captchaData['value'] ?? 'N/A',
+            'expires_at' => $captchaData['expires_at'] ?? 'N/A',
+            'current_time' => now()->toDateTimeString()
+        ]);
+
         // Check expiration
         if (now()->greaterThan($captchaData['expires_at'])) {
+            \Log::warning('❌ CAPTCHA VERIFICATION FAILED: Expired', [
+                'expires_at' => $captchaData['expires_at'],
+                'current_time' => now()->toDateTimeString()
+            ]);
             Session::forget("{$sessionKey}.{$type}");
             return false;
         }
 
         $caseSensitive = config('captcha.case_sensitive', false);
         $expectedValue = $captchaData['value'];
-        
+
+        // Log: Before case conversion
+        \Log::info('🔄 CAPTCHA COMPARISON', [
+            'input_original' => $input,
+            'expected_original' => $expectedValue,
+            'case_sensitive' => $caseSensitive
+        ]);
+
         if (!$caseSensitive) {
             $input = strtolower($input);
             $expectedValue = strtolower($expectedValue);
         }
 
+        // Log: After case conversion
+        \Log::info('🔄 CAPTCHA COMPARISON (after case conversion)', [
+            'input_processed' => $input,
+            'expected_processed' => $expectedValue,
+            'input_length' => strlen($input),
+            'expected_length' => strlen($expectedValue)
+        ]);
+
         $isValid = $input === $expectedValue;
 
-        // Clear session after verification
+        // Log: Final result
         if ($isValid) {
+            \Log::info('✅ CAPTCHA VERIFICATION SUCCESS', [
+                'input' => $input,
+                'expected' => $expectedValue
+            ]);
             Session::forget("{$sessionKey}.{$type}");
+        } else {
+            \Log::error('❌ CAPTCHA VERIFICATION FAILED: Mismatch', [
+                'input' => $input,
+                'expected' => $expectedValue,
+                'input_hex' => bin2hex($input),
+                'expected_hex' => bin2hex($expectedValue)
+            ]);
         }
 
         return $isValid;
@@ -136,7 +197,7 @@ class CaptchaManager
         }
 
         $generator = new $this->generators[$type]($difficulty);
-        
+
         if (!method_exists($generator, 'image')) {
             throw new \BadMethodCallException("Generator [{$type}] does not support image generation.");
         }
@@ -161,10 +222,32 @@ class CaptchaManager
         }
 
         $generator = new $this->generators[$type]($difficulty);
-        
+
         if (!method_exists($generator, 'svg')) {
             throw new \BadMethodCallException("Generator [{$type}] does not support SVG generation.");
         }
+
+        // Generate captcha data and store in session
+        $data = $generator->generate();
+
+        // Store in session
+        $sessionKey = config('captcha.session_key', 'laravel_captcha');
+        $expiresAt = now()->addMinutes(config('captcha.expire', 5));
+
+        Session::put("{$sessionKey}.{$type}", [
+            'value' => $data['value'],
+            'expires_at' => $expiresAt,
+        ]);
+
+        // Log: Captcha generated via SVG route
+        \Log::info('🎨 CAPTCHA GENERATED (SVG Route)', [
+            'type' => $type,
+            'difficulty' => $difficulty,
+            'value' => $data['value'],
+            'session_key' => "{$sessionKey}.{$type}",
+            'expires_at' => $expiresAt->toDateTimeString(),
+            'session_id' => Session::getId()
+        ]);
 
         return $generator->svg();
     }
@@ -179,7 +262,7 @@ class CaptchaManager
     {
         $type = $type ?? config('captcha.default', 'image');
         $sessionKey = config('captcha.session_key', 'laravel_captcha');
-        
+
         return Session::get("{$sessionKey}.{$type}");
     }
 
@@ -193,7 +276,7 @@ class CaptchaManager
     {
         $type = $type ?? config('captcha.default', 'image');
         $sessionKey = config('captcha.session_key', 'laravel_captcha');
-        
+
         Session::forget("{$sessionKey}.{$type}");
     }
 
@@ -205,7 +288,7 @@ class CaptchaManager
     public function clear(): void
     {
         $sessionKey = config('captcha.session_key', 'laravel_captcha');
-        
+
         foreach (array_keys($this->generators) as $type) {
             Session::forget("{$sessionKey}.{$type}");
         }
