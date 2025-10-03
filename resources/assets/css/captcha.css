@@ -269,9 +269,88 @@
     .captcha-question {
         font-size: 18px;
     }
-    
+
     .captcha-slider-background {
         width: 100% !important;
     }
 }
 
+/* Additional Captcha Styles for Better Integration */
+#captcha-svg {
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+#captcha-svg img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: block;
+    max-width: 100%;
+    height: auto;
+    background: white;
+    margin: 0 auto;
+}
+
+.captcha-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .captcha-image-container,
+    #captcha-svg {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+
+    .captcha-image,
+    #captcha-svg img {
+        border-color: #495057;
+    }
+
+    .captcha-input {
+        background-color: #343a40;
+        border-color: #495057;
+        color: #fff;
+    }
+
+    .captcha-input:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .captcha-question-container {
+        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    }
+}
+
+/* RTL Support */
+[dir="rtl"] .captcha-input-group {
+    direction: rtl;
+}
+
+[dir="rtl"] .captcha-refresh {
+    left: 5px;
+    right: auto;
+}
+
+/* Integration with Modern Forms */
+.modern-form-control.captcha-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.modern-form-control.captcha-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
