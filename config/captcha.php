@@ -45,6 +45,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Auto Clear Session
+    |--------------------------------------------------------------------------
+    |
+    | Automatically clear captcha from session after successful verification.
+    | Set to false to prevent issues with double validation (e.g., in Fortify).
+    | The captcha will expire naturally based on the 'expire' setting.
+    |
+    */
+    'auto_clear' => env('CAPTCHA_AUTO_CLEAR', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Image Captcha Settings
     |--------------------------------------------------------------------------
     */
@@ -54,7 +66,7 @@ return [
         | Set to true to use SVG, false to use PNG with GD library
         */
         'use_svg' => env('CAPTCHA_USE_SVG', true),
-        
+
         'width' => 200,
         'height' => 60,
         'length' => [

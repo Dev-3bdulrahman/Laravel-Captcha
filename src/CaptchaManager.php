@@ -167,7 +167,11 @@ class CaptchaManager
                 'input' => $input,
                 'expected' => $expectedValue
             ]);
-            Session::forget("{$sessionKey}.{$type}");
+
+            // Only forget session if auto_clear is enabled (default: false to prevent double validation issues)
+            if (config('captcha.auto_clear', false)) {
+                Session::forget("{$sessionKey}.{$type}");
+            }
         } else {
             \Log::error('❌ CAPTCHA VERIFICATION FAILED: Mismatch', [
                 'input' => $input,
