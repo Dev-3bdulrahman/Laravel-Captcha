@@ -206,6 +206,28 @@ class CaptchaManager
             throw new \BadMethodCallException("Generator [{$type}] does not support image generation.");
         }
 
+        // Generate captcha data and store in session
+        $data = $generator->generate();
+
+        // Store in session
+        $sessionKey = config('captcha.session_key', 'laravel_captcha');
+        $expiresAt = now()->addMinutes(config('captcha.expire', 5));
+
+        Session::put("{$sessionKey}.{$type}", [
+            'value' => $data['value'],
+            'expires_at' => $expiresAt,
+        ]);
+
+        // Log: Captcha generated via image route
+        \Log::info('🎨 CAPTCHA GENERATED (Image Route)', [
+            'type' => $type,
+            'difficulty' => $difficulty,
+            'value' => $data['value'],
+            'session_key' => "{$sessionKey}.{$type}",
+            'expires_at' => $expiresAt->toDateTimeString(),
+            'session_id' => Session::getId()
+        ]);
+
         return $generator->image();
     }
 
