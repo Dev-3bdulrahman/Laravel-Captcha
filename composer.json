@@ -1,6 +1,6 @@
 {
     "name": "dev-3bdulrahman/laravel-captcha",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "A simple, standalone Laravel CAPTCHA package with multiple styles and difficulty levels",
     "keywords": ["laravel", "captcha", "security", "validation", "spam-protection"],
     "type": "library",
