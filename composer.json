@@ -1,5 +1,6 @@
 {
     "name": "dev-3bdulrahman/laravel-captcha",
+    "version": "2.1.0",
     "description": "A simple, standalone Laravel CAPTCHA package with multiple styles and difficulty levels",
     "keywords": ["laravel", "captcha", "security", "validation", "spam-protection"],
     "type": "library",
@@ -7,15 +8,15 @@
     "authors": [
         {
             "name": "Abdulrahman Mehesan",
-            "email": "contact@3bdulrahman.com",
-            "homepage": "https://3bdulrahman.com/"
+            "email": "dev.3bdulrahman@gmail.com",
+            "homepage": "https://3bdulrahman.com"
         }
     ],
     "homepage": "https://github.com/Dev-3bdulrahman/Laravel-Captcha",
     "require": {
-        "php": "^8.0|^8.1|^8.2|^8.3",
-        "illuminate/support": "^9.0|^10.0|^11.0",
-        "illuminate/session": "^9.0|^10.0|^11.0",
+        "php": "^8.0|^8.1|^8.2|^8.3|^8.4",
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/session": "^9.0|^10.0|^11.0|^12.0",
         "intervention/image": "^2.7|^3.0"
     },
     "require-dev": {

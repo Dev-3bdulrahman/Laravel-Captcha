@@ -17,7 +17,7 @@
     "validation",
     "spam-protection"
   ],
-  "author": "Abdulrahman Mehesan <contact@3bdulrahman.com> (https://3bdulrahman.com/)",
+  "author": "Abdulrahman Mehesan <dev.3bdulrahman@gmail.com> (https://3bdulrahman.com/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Dev-3bdulrahman/Laravel-Captcha/issues"

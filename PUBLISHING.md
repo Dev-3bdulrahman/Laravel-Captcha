@@ -279,7 +279,7 @@ Follow semantic versioning (semver):
 ## Contact
 
 If you need help publishing:
-- Email: contact@3bdulrahman.com
+- Email: dev.3bdulrahman@gmail.com
 - GitHub: @Dev-3bdulrahman
 - Website: https://3bdulrahman.com/
 

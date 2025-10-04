@@ -215,7 +215,7 @@ This package is open-sourced software licensed under the [MIT license](LICENSE).
 
 - Website: [https://3bdulrahman.com/](https://3bdulrahman.com/)
 - GitHub: [@Dev-3bdulrahman](https://github.com/Dev-3bdulrahman)
-- Email: contact@3bdulrahman.com
+- Email: dev.3bdulrahman@gmail.com
 
 ## 🙏 Acknowledgments
 
@@ -245,7 +245,7 @@ This package is open-sourced software licensed under the [MIT license](LICENSE).
 
 - **Issues:** [GitHub Issues](https://github.com/Dev-3bdulrahman/Laravel-Captcha/issues)
 - **Discussions:** [GitHub Discussions](https://github.com/Dev-3bdulrahman/Laravel-Captcha/discussions)
-- **Email:** contact@3bdulrahman.com
+- **Email:** dev.3bdulrahman@gmail.com
 
 ## 🌟 Show Your Support
 

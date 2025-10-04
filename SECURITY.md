@@ -18,7 +18,7 @@ Please **do not** open a public GitHub issue for security vulnerabilities.
 
 ### 2. Contact Us Privately
 
-Send an email to: **contact@3bdulrahman.com**
+Send an email to: **dev.3bdulrahman@gmail.com**
 
 Include the following information:
 - Type of vulnerability
@@ -90,7 +90,7 @@ We currently do not have a bug bounty program, but we greatly appreciate respons
 ## Questions?
 
 If you have questions about this security policy, please contact:
-- Email: contact@3bdulrahman.com
+- Email: dev.3bdulrahman@gmail.com
 - Website: https://3bdulrahman.com/
 
 ---

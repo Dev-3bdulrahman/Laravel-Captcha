@@ -226,7 +226,7 @@ $request->validate([
 
 - **Issues:** GitHub Issues
 - **Discussions:** GitHub Discussions
-- **Email:** contact@3bdulrahman.com
+- **Email:** dev.3bdulrahman@gmail.com
 
 ## 🙏 Credits
 
