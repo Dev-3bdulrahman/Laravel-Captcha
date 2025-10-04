@@ -4,213 +4,191 @@
  * @link https://3bdulrahman.com/
  */
 
-class LaravelCaptcha {
-    constructor(containerId, options = {}) {
-        this.container = document.getElementById(containerId);
-        if (!this.container) {
-            console.error('Captcha container not found:', containerId);
-            return;
-        }
-
-        this.options = {
-            type: options.type || 'image',
-            difficulty: options.difficulty || 'medium',
-            style: options.style || 'default',
-            onSuccess: options.onSuccess || null,
-            onError: options.onError || null,
-            ...options
-        };
-
-        this.init();
+function refreshCaptcha(captchaId) {
+    const refreshBtn = document.querySelector(`#${captchaId} .captcha-refresh`);
+    const questionElement = document.querySelector(`#${captchaId}-question`);
+    const imageElement = document.querySelector(`#${captchaId}-image`);
+    const inputElement = document.querySelector(`#${captchaId}-input`);
+    const wrapper = document.querySelector(`#${captchaId} .captcha-math-wrapper, #${captchaId} .captcha-image-wrapper`);
+    
+    if (!refreshBtn) return;
+    
+    // Add spinning animation
+    refreshBtn.classList.add('spinning');
+    wrapper.classList.add('captcha-loading');
+    
+    // Clear input
+    if (inputElement) {
+        inputElement.value = '';
+        inputElement.classList.remove('is-invalid', 'is-valid');
     }
-
-    init() {
-        if (this.options.type === 'slider') {
-            this.initSlider();
+    
+    // Simulate loading (replace with actual AJAX call if needed)
+    setTimeout(() => {
+        // Remove loading states
+        refreshBtn.classList.remove('spinning');
+        wrapper.classList.remove('captcha-loading');
+        
+        // Refresh image captcha if it's an image type
+        if (imageElement) {
+            const currentSrc = imageElement.src;
+            const newSrc = currentSrc.includes('?') ? currentSrc + '&t=' + Date.now() : currentSrc + '?t=' + Date.now();
+            imageElement.src = newSrc;
         }
-
-        // Add input validation
-        const input = this.container.querySelector('.captcha-input');
-        if (input) {
-            input.addEventListener('input', () => {
-                input.classList.remove('success', 'error');
-            });
+        
+        // Trigger Livewire refresh if available
+        if (window.Livewire) {
+            window.Livewire.emit('refreshCaptcha');
         }
-    }
+    }, 500);
+}
 
-    initSlider() {
-        const handle = this.container.querySelector('.captcha-slider-handle');
-        const track = this.container.querySelector('.captcha-slider-track');
-        const input = this.container.querySelector('input[type="hidden"]');
-        const sliderContainer = this.container.querySelector('.captcha-slider-container');
-
-        if (!handle || !track || !input || !sliderContainer) return;
-
-        let isDragging = false;
-        let startX = 0;
-        let currentX = 0;
-        const maxX = track.offsetWidth - handle.offsetWidth;
-
-        const onMouseDown = (e) => {
-            isDragging = true;
-            startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
-            handle.style.transition = 'none';
-        };
-
-        const onMouseMove = (e) => {
-            if (!isDragging) return;
-
-            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
-            const deltaX = clientX - startX;
-            currentX = Math.max(0, Math.min(maxX, deltaX));
-
-            handle.style.left = currentX + 'px';
-            input.value = currentX;
-        };
-
-        const onMouseUp = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            handle.style.transition = '';
-
-            // Verify position
-            const targetPosition = parseInt(sliderContainer.dataset.position);
-            const tolerance = parseInt(sliderContainer.dataset.tolerance);
-            const trackWidth = track.offsetWidth;
-            const backgroundWidth = this.container.querySelector('.captcha-slider-background').offsetWidth;
+// Enhanced input validation and user feedback
+document.addEventListener('DOMContentLoaded', function() {
+    const captchaInputs = document.querySelectorAll('.captcha-input');
+    
+    captchaInputs.forEach(input => {
+        // Real-time validation feedback
+        input.addEventListener('input', function() {
+            const value = this.value.trim();
+            const isMathCaptcha = this.closest('.captcha-math-wrapper');
             
-            // Calculate the actual position based on the slider position
-            const actualPosition = (currentX / maxX) * backgroundWidth;
-
-            if (Math.abs(actualPosition - targetPosition) <= tolerance) {
-                this.onSliderSuccess();
+            // Remove previous states
+            this.classList.remove('is-invalid', 'is-valid');
+            
+            // Validation based on captcha type
+            if (isMathCaptcha) {
+                // Math captcha: numbers only
+                if (value && /^\d+$/.test(value)) {
+                    this.classList.add('is-valid');
+                } else if (value && !/^\d+$/.test(value)) {
+                    this.classList.add('is-invalid');
+                }
             } else {
-                this.onSliderError();
-            }
-        };
-
-        // Mouse events
-        handle.addEventListener('mousedown', onMouseDown);
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-
-        // Touch events
-        handle.addEventListener('touchstart', onMouseDown);
-        document.addEventListener('touchmove', onMouseMove);
-        document.addEventListener('touchend', onMouseUp);
-    }
-
-    onSliderSuccess() {
-        const handle = this.container.querySelector('.captcha-slider-handle');
-        const text = this.container.querySelector('.captcha-slider-text');
-        
-        handle.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
-        text.textContent = '✓ Verified!';
-        text.style.color = '#4CAF50';
-
-        if (this.options.onSuccess) {
-            this.options.onSuccess();
-        }
-    }
-
-    onSliderError() {
-        const handle = this.container.querySelector('.captcha-slider-handle');
-        const text = this.container.querySelector('.captcha-slider-text');
-        
-        handle.style.background = 'linear-gradient(135deg, #f44336 0%, #da190b 100%)';
-        text.textContent = '✗ Try again';
-        text.style.color = '#f44336';
-
-        // Reset after 1 second
-        setTimeout(() => {
-            handle.style.left = '0px';
-            handle.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            text.textContent = 'Slide to complete';
-            text.style.color = '#999';
-        }, 1000);
-
-        if (this.options.onError) {
-            this.options.onError();
-        }
-    }
-
-    async verify(value) {
-        try {
-            const response = await fetch('/captcha/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                },
-                body: JSON.stringify({
-                    captcha: value,
-                    type: this.options.type
-                })
-            });
-
-            const data = await response.json();
-            return data.success;
-        } catch (error) {
-            console.error('Captcha verification error:', error);
-            return false;
-        }
-    }
-
-    async refresh() {
-        const container = this.container;
-        container.classList.add('captcha-loading');
-
-        try {
-            const response = await fetch(`/captcha/refresh?type=${this.options.type}&difficulty=${this.options.difficulty}`);
-            const data = await response.json();
-
-            if (data.success) {
-                // Refresh based on type
-                if (this.options.type === 'image') {
-                    const img = container.querySelector('.captcha-image');
-                    if (img) {
-                        img.src = data.data.image_url + '&t=' + Date.now();
-                    }
-                } else if (this.options.type === 'math' || this.options.type === 'text') {
-                    const question = container.querySelector('.captcha-question');
-                    if (question) {
-                        question.textContent = data.data.question;
-                    }
-                } else if (this.options.type === 'slider') {
-                    // Reload the entire slider
-                    location.reload();
-                }
-
-                // Clear input
-                const input = container.querySelector('.captcha-input');
-                if (input) {
-                    input.value = '';
-                    input.classList.remove('success', 'error');
+                // Image captcha: any text
+                if (value && value.length >= 3) {
+                    this.classList.add('is-valid');
                 }
             }
-        } catch (error) {
-            console.error('Captcha refresh error:', error);
-        } finally {
-            container.classList.remove('captcha-loading');
+        });
+        
+        // Enhanced focus effects
+        input.addEventListener('focus', function() {
+            const wrapper = this.closest('.captcha-math-wrapper, .captcha-image-wrapper');
+            const container = this.closest('.captcha-container');
+            if (wrapper) {
+                wrapper.style.transform = 'translateY(-2px)';
+                wrapper.style.boxShadow = '0 8px 16px rgba(120, 136, 252, 0.15)';
+            }
+            if (container) {
+                container.classList.add('active');
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            const wrapper = this.closest('.captcha-math-wrapper, .captcha-image-wrapper');
+            const container = this.closest('.captcha-container');
+            if (wrapper) {
+                wrapper.style.transform = 'translateY(0)';
+                wrapper.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+            }
+            if (container) {
+                container.classList.remove('active');
+            }
+        });
+        
+        // Prevent non-numeric input for math captcha only
+        input.addEventListener('keypress', function(e) {
+            const isMathCaptcha = this.closest('.captcha-math-wrapper');
+            
+            if (!isMathCaptcha) return; // Allow all input for image captcha
+            
+            // Allow backspace, delete, tab, escape, enter
+            if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+                // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode === 67 && e.ctrlKey === true) ||
+                (e.keyCode === 86 && e.ctrlKey === true) ||
+                (e.keyCode === 88 && e.ctrlKey === true)) {
+                return;
+            }
+            
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Add hover effects to refresh buttons
+    const refreshButtons = document.querySelectorAll('.captcha-refresh');
+    refreshButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // Add keyboard shortcut for refresh (Ctrl+R on captcha input)
+    captchaInputs.forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.keyCode === 82) { // Ctrl+R
+                e.preventDefault();
+                const captchaId = this.id.replace('-input', '');
+                refreshCaptcha(captchaId);
+            }
+        });
+    });
+});
+
+// Add smooth animations for form submission
+document.addEventListener('submit', function(e) {
+    const form = e.target;
+    const captchaInputs = form.querySelectorAll('.captcha-input');
+    
+    captchaInputs.forEach(input => {
+        const wrapper = input.closest('.captcha-math-wrapper');
+        if (wrapper && input.value.trim()) {
+            wrapper.style.opacity = '0.8';
+            wrapper.style.pointerEvents = 'none';
+        }
+    });
+});
+
+// Auto-focus on captcha input when question container is clicked
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.captcha-question-container')) {
+        const container = e.target.closest('.captcha-container');
+        const input = container.querySelector('.captcha-input');
+        if (input) {
+            input.focus();
         }
     }
-}
+});
 
-// Global refresh function for inline onclick handlers
-function refreshCaptcha(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const type = container.dataset.type;
-    const difficulty = container.dataset.difficulty;
-    const style = container.dataset.style || 'default';
-
-    const captcha = new LaravelCaptcha(containerId, { type, difficulty, style });
-    captcha.refresh();
-}
-
-// Export for module usage
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = LaravelCaptcha;
-}
-
+// Add accessibility improvements
+document.addEventListener('DOMContentLoaded', function() {
+    const captchaContainers = document.querySelectorAll('.captcha-container');
+    
+    captchaContainers.forEach(container => {
+        // Add ARIA labels
+        const question = container.querySelector('.captcha-question');
+        const input = container.querySelector('.captcha-input');
+        const refreshBtn = container.querySelector('.captcha-refresh');
+        
+        if (question && input) {
+            const questionId = 'captcha-question-' + Math.random().toString(36).substr(2, 9);
+            question.id = questionId;
+            input.setAttribute('aria-describedby', questionId);
+            input.setAttribute('aria-label', 'حل المعادلة الرياضية للتحقق من الهوية');
+        }
+        
+        if (refreshBtn) {
+            refreshBtn.setAttribute('aria-label', 'تحديث الكابتشا');
+            refreshBtn.setAttribute('role', 'button');
+        }
+    });
+});

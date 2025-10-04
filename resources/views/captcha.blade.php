@@ -16,7 +16,6 @@
         @include('captcha::types.slider', ['id' => $id, 'difficulty' => $difficulty, 'style' => $style])
     @endif
 </div>
-
 @once
     @push('styles')
         <link rel="stylesheet" href="{{ asset('vendor/captcha/css/captcha.css') }}">
